@@ -1,0 +1,17 @@
+{
+  "name": "smartchef-ai",
+  "version": "0.0.1",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently --names \"API,APP\" --prefix-colors \"green,magenta\" \"npm run dev:backend\" \"npm run dev:fronted\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:fronted": "npm run dev --prefix fronted"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
