@@ -7,9 +7,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently --names \"API,APP\" --prefix-colors \"green,magenta\" \"npm run dev:backend\" \"npm run dev:fronted\"",
+    "dev": "concurrently --names \"API,APP\" --prefix-colors \"green,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --prefix backend",
-    "dev:fronted": "npm run dev --prefix fronted"
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:fronted": "npm run dev:frontend"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
