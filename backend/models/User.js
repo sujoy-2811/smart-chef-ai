@@ -1,12 +1,13 @@
 import db from "../config/db.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 class User {
   // Create a new user
   static async create(username, email, password) {
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const result = await db.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
       [username, email, hashedPassword]
     );
     return result.rows[0];
@@ -53,3 +54,5 @@ class User {
     return await bcrypt.compare(password, hashedPassword);
   }
 }
+
+export default User;

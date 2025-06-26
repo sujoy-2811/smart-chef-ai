@@ -12,35 +12,39 @@ class UserPreference {
     } = preferences;
 
     const result = await db.query(
-      `INSERT INTO user_preferences (user_id, dietary_restrictions, allergies, preferred_cuisines, default_serving_size, measurement_units)
+      `INSERT INTO user_preferences (user_id, dietary_restrictions, allergies, preferred_cuisines, default_servings, measurement_units)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (user_id) DO UPDATE SET
          dietary_restrictions = $2,
          allergies = $3,
          preferred_cuisines = $4,
-         default_serving_size = $5,
-         measurement_units = $6
-       RETURNING *`, [userId, dietary_restrictions, allergies, preferred_cuisines, default_serving_size, measurement_units]
+         default_servings = $5
+       RETURNING *`,
+      [
+        userId,
+        dietary_restrictions,
+        allergies,
+        preferred_cuisines,
+        default_serving_size,
+        measurement_units,
+      ]
     );
     return result.rows[0];
   }
 
-    // Get user preferences by user ID
-    static async findByUserId(userId) {
-        const result = await db.query(
-            `SELECT * FROM user_preferences WHERE user_id = $1`, [userId]
-        );
-        return result.rows[0] || null;
-    }
+  // Get user preferences by user ID
+  static async findByUserId(userId) {
+    const result = await db.query(
+      `SELECT * FROM user_preferences WHERE user_id = $1`,
+      [userId]
+    );
+    return result.rows[0] || null;
+  }
 
-    // Delete user preferences by user ID
-    static async delete(userId) {
-        await db.query(
-            `DELETE FROM user_preferences WHERE user_id = $1`, [userId]
-        );
-    }
-
-
+  // Delete user preferences by user ID
+  static async delete(userId) {
+    await db.query(`DELETE FROM user_preferences WHERE user_id = $1`, [userId]);
+  }
 }
 
 export default UserPreference;

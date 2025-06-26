@@ -17,8 +17,9 @@ CREATE TABLE IF NOT EXISTS user_preferences (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     dietary_restrictions TEXT,
     allergies TEXT[] DEFAULT '{}',
-    prefrerred_cuisines TEXT[] DEFAULT '{}',
+    preferred_cuisines TEXT[] DEFAULT '{}',
     default_servings INTEGER DEFAULT 4,
+    measurement_units VARCHAR(50) DEFAULT 'metric',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (user_id)
