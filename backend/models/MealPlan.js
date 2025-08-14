@@ -9,7 +9,7 @@ class MealPlan {
 
     const result = await db.query(
       `INSERT INTO meal_plans (user_id, recipe_id, meal_date, meal_type)
-             VALUES ($1, $2, $3::date, $4) ON CONFLICT (user_id, recipe_id, meal_type) DO  UPDATE SET  recipe_id = $2 RETURNING *`,
+             VALUES ($1, $2, $3::date, $4) ON CONFLICT (user_id, meal_date, meal_type) DO UPDATE SET recipe_id = $2 RETURNING *`,
       [userId, recipe_id, date, meal_type]
     );
     return result.rows[0];
@@ -40,11 +40,12 @@ class MealPlan {
     const result = await db.query(
       `SELECT mp.*, r.name as recipe_name, r.image_url FROM meal_plans mp 
                 JOIN recipes r ON mp.recipe_id = r.id
-                WHERE mp.user_id = $1 AND mp.meal_date >= CURRENT_DATE  ORDER BY mp.meal_date ASC CASE
+                WHERE mp.user_id = $1 AND mp.meal_date >= CURRENT_DATE
+                ORDER BY mp.meal_date ASC, CASE
                 WHEN mp.meal_type = 'breakfast' THEN 1
                 WHEN mp.meal_type = 'lunch' THEN 2
                 WHEN mp.meal_type = 'dinner' THEN 3
-                END LiMIT $2`,
+                END LIMIT $2`,
       [userId, limit]
     );
     return result.rows;
@@ -64,7 +65,7 @@ class MealPlan {
     const result = await db.query(
       `SELECT
             COUNT(*) as total_meals,
-            COUNT(*) FILTER(WHERE  meal_date>= CURRENT_DATE) + INTERVAL '7 days'  as this_week_count,
+            COUNT(*) FILTER(WHERE meal_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days') as this_week_count
             FROM meal_plans
             WHERE user_id = $1`,
       [userId]

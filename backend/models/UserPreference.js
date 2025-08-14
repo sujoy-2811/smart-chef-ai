@@ -18,7 +18,8 @@ class UserPreference {
          dietary_restrictions = $2,
          allergies = $3,
          preferred_cuisines = $4,
-         default_servings = $5
+         default_servings = $5,
+         measurement_units = $6
        RETURNING *`,
       [
         userId,

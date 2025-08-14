@@ -3,20 +3,20 @@ import db from "../config/db.js";
 class ShoppingList {
   // Create shopping list from meal plan
   static async generateFromMealPlan(userId, startDate, endDate) {
-    const client = await db.connect();
+    const client = await db.pool.connect();
     try {
       await client.query("BEGIN");
 
       // clear exisitng meal plan items
       await client.query(
-        "DELETE FROM shopping_list_item WHERE user_id = $1 AND from_meal_plan = true",
+        "DELETE FROM shopping_lists WHERE user_id = $1 AND from_meal_plan = true",
         [userId]
       );
 
       // GET all ingredients from meal plan recipes
       const result = await client.query(
         `
-                SELECT ri.ingredient_name, ri.unit, SUM(ri.quantity) AS total_quantity FROM meal_plan mp
+                SELECT ri.ingredient_name, ri.unit, SUM(ri.quantity) AS total_quantity FROM meal_plans mp
                 JOIN recipe_ingredients ri ON mp.recipe_id = ri.recipe_id
                 WHERE mp.user_id = $1
                 AND mp.meal_date >= $2
@@ -31,7 +31,7 @@ class ShoppingList {
       // Get pantry items to subtract
       const pantryResult = await client.query(
         `
-                SELECT name , quantity, unit FROM pantry_item WHERE user_id = $1
+                SELECT name , quantity, unit FROM pantry_items WHERE user_id = $1
             `,
         [userId]
       );
@@ -54,7 +54,7 @@ class ShoppingList {
         if (neededQty > 0) {
           await client.query(
             `
-                        INSERT INTO shopping_list_item (user_id, ingredient_name, quantity, unit, from_meal_plan, category)
+                        INSERT INTO shopping_lists (user_id, ingredient_name, quantity, unit, from_meal_plan, category)
                         VALUES ($1, $2, $3, $4, true, $5)
                     `,
             [userId, ing.ingredient_name, neededQty, ing.unit, ing.category]
@@ -80,7 +80,7 @@ class ShoppingList {
       category = "Uncategorized",
     } = itemData;
     const result = await db.query(
-      `INSERT INTO shopping_list_item (user_id, ingredient_name, quantity, unit, category, from_meal_plan) VALUES ($1, $2, $3, $4, $5, false) RETURNING *`,
+      `INSERT INTO shopping_lists (user_id, ingredient_name, quantity, unit, category, from_meal_plan) VALUES ($1, $2, $3, $4, $5, false) RETURNING *`,
       [user_id, ingredient_name, quantity, unit, category]
     );
     return result.rows[0];
@@ -89,7 +89,7 @@ class ShoppingList {
   // Get shopping list items for user
   static async findByUserId(userId) {
     const result = await db.query(
-      `SELECT * FROM shopping_list_item WHERE user_id = $1 ORDER BY category, ingredient_name`,
+      `SELECT * FROM shopping_lists WHERE user_id = $1 ORDER BY category, ingredient_name`,
       [userId]
     );
     return result.rows;
@@ -100,7 +100,7 @@ class ShoppingList {
     const result = await db.query(
       `
             SELECT category, json_agg(json_build_object('id', id, 'ingredient_name', ingredient_name, 'quantity', quantity, 'unit', unit, 'is_checked', is_checked, 'from_meal_plan', from_meal_plan)) AS items
-            FROM shopping_list_item
+            FROM shopping_lists
             WHERE user_id = $1
             GROUP BY category
             ORDER BY category
@@ -115,7 +115,7 @@ class ShoppingList {
     const { ingredient_name, quantity, unit, category, is_checked } = updates;
     const result = await db.query(
       `
-            UPDATE shopping_list_item 
+            UPDATE shopping_lists 
             SET ingredient_name = COALESCE($1, ingredient_name),
                 quantity = COALESCE($2, quantity),
                 unit = COALESCE($3, unit),
@@ -133,7 +133,7 @@ class ShoppingList {
   static async toggleChecked(id, userId) {
     const result = await db.query(
       `
-            UPDATE shopping_list_item 
+            UPDATE shopping_lists 
             SET is_checked = NOT is_checked
             WHERE id = $1 AND user_id = $2
             RETURNING *
@@ -146,7 +146,7 @@ class ShoppingList {
   // Delete shopping list item
   static async delete(id, userId) {
     const result = await db.query(
-      `DELETE FROM shopping_list_item WHERE id = $1 AND user_id = $2 RETURNING *`,
+      `DELETE FROM shopping_lists WHERE id = $1 AND user_id = $2 RETURNING *`,
       [id, userId]
     );
     return result.rows[0];
@@ -155,7 +155,7 @@ class ShoppingList {
   // Clear all checked items
   static async clearChecked(userId) {
     const result = await db.query(
-      `DELETE FROM shopping_list_item WHERE user_id = $1 AND is_checked = true RETURNING *`,
+      `DELETE FROM shopping_lists WHERE user_id = $1 AND is_checked = true RETURNING *`,
       [userId]
     );
     return result.rows;
@@ -164,7 +164,7 @@ class ShoppingList {
   // Clear entire shopping list
   static async clearAll(userId) {
     const result = await db.query(
-      `DELETE FROM shopping_list_item WHERE user_id = $1 RETURNING *`,
+      `DELETE FROM shopping_lists WHERE user_id = $1 RETURNING *`,
       [userId]
     );
     return result.rows;
@@ -172,13 +172,13 @@ class ShoppingList {
 
   // ADD checked items to pantry
   static async addCheckedToPantry(userId) {
-    const client = await db.connect();
+    const client = await db.pool.connect();
     try {
       await client.query("BEGIN");
 
       // Get checked items
       const checkedItems = await client.query(
-        `SELECT * FROM shopping_list_item WHERE user_id = $1 AND is_checked = true`,
+        `SELECT * FROM shopping_lists WHERE user_id = $1 AND is_checked = true`,
         [userId]
       );
 
@@ -186,7 +186,7 @@ class ShoppingList {
       for (const item of checkedItems.rows) {
         await client.query(
           `
-                    INSERT INTO pantry_item (user_id, name, quantity, unit, category)
+                    INSERT INTO pantry_items (user_id, name, quantity, unit, category)
                     VALUES ($1, $2, $3, $4, $5)`,
           [
             userId,
@@ -200,7 +200,7 @@ class ShoppingList {
 
       // Delete checked items from shopping list
       await client.query(
-        `DELETE FROM shopping_list_item WHERE user_id = $1 AND is_checked = true`,
+        `DELETE FROM shopping_lists WHERE user_id = $1 AND is_checked = true`,
         [userId]
       );
 

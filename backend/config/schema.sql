@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS pantry_items (
     quantity VARCHAR(255) NOT NULL,
     unit VARCHAR(50) NOT NULL,
     category VARCHAR(255) NOT NULL,
-    expiration_date DATE,
+    expiry_date DATE,
     is_running_low BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS meal_plans (
     meal_date DATE NOT NULL,
     meal_type VARCHAR(50) NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner')),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, meal_date, meal_type)
 );
 
 
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS meal_plans (
 CREATE TABLE IF NOT EXISTS shopping_lists (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    igredient_name VARCHAR(255) NOT NULL,
+    ingredient_name VARCHAR(255) NOT NULL,
     quantity DECIMAL(10, 2) NOT NULL,
     unit VARCHAR(50) NOT NULL,
     category VARCHAR(100) ,
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS shopping_lists (
 -- CREATE INDEX for Better QUERY PERFORMANCE
 CREATE INDEX IF NOT EXISTS idx_users_email ON pantry_items (user_id);
 CREATE INDEX IF NOT EXISTS idx_pantry_items_user_id ON pantry_items (category);
-CREATE INDEX IF NOT EXISTS idx_pantry_expiry ON pantry_items (expiration_date);
+CREATE INDEX IF NOT EXISTS idx_pantry_expiry ON pantry_items (expiry_date);
 
 CREATE INDEX IF NOT EXISTS idx_recipes_user_id ON recipes (user_id);
 CREATE INDEX IF NOT EXISTS idx_recipes_cuisine ON recipes (cuisine_type);
