@@ -7,7 +7,7 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_KEY,
 });
 
-if (!process.env.GEMINI_KEY || process.env.AI_MODEL) {
+if (!process.env.GEMINI_KEY || !process.env.AI_MODEL) {
   console.error("GEMINI_KEY is not set. AI features will not work.");
 }
 
@@ -18,9 +18,15 @@ export const generateRecipe = async ({
   servings = 4,
   cookingTime = "medium",
 }) => {
+  const safeDietaryRestrictions = Array.isArray(dietaryRestrictions)
+    ? dietaryRestrictions
+    : [];
+
+  const safeIngredients = Array.isArray(ingredients) ? ingredients : [];
+
   const dietaryInfo =
-    dietaryRestrictions.length > 0
-      ? `Dietary restrictions: ${dietaryRestrictions.join(", ")}.`
+    safeDietaryRestrictions.length > 0
+      ? `Dietary restrictions: ${safeDietaryRestrictions.join(", ")}.`
       : "No dietary restrictions.";
 
   const timeGuide = {
@@ -31,7 +37,7 @@ export const generateRecipe = async ({
 
   const prompt = `Generate a detailed recipe with the following requirements :
     
-    Ingredients available: ${ingredients.join(", ")}
+    Ingredients available: ${safeIngredients.join(", ")}
     ${dietaryInfo}
     Cuisine type: ${cuisineType}
     Servings: ${servings}
@@ -39,11 +45,11 @@ export const generateRecipe = async ({
 
     Please provide a complete recipe in the following JSON format (return only valid JSON , no markdown):
 
-    {   
-        "name" : "Recipe Name",
-        "description" : "Brief description of the recipe",
-        "cuisineType" : ${cuisineType},
-        difficulty : "easy/medium/hard",
+    {
+        "name": "Recipe Name",
+        "description": "Brief description of the recipe",
+        "cuisineType": "${cuisineType}",
+        "difficulty": "easy/medium/hard",
         "prepTime" : number (in minutes),
         "cookTime" : number (in minutes),
         "servings" : ${servings},
@@ -59,13 +65,13 @@ export const generateRecipe = async ({
             "Step 2 description",
         ],
 
-        "dietaryTags" : [ "vegetarian", "gluten-free" , etc ],
-        "nutrition" : {
-            "calories" : number,
-            "protein" : number (in grams),
-            "carbs" : number (in grams),
-            "fat" : number (in grams)
-            "fiber" : number (in grams)
+        "dietaryTags": ["vegetarian", "gluten-free", etc.],
+        "nutrition": {
+            "calories": number (in grams),
+            "protein": number (in grams),
+            "carbs": number (in grams),
+            "fats": number (in grams),
+            "fiber": number (in grams)
         },
         "cookingTips" : [
             "Tip 1",
@@ -73,12 +79,12 @@ export const generateRecipe = async ({
         ]   
     }
 
-    Make sure the recipe is creative and utilizes the provided ingredients effectively. `;
+    Make sure the recipe is creative and utilizes the provided ingredients effectively.`;
 
   try {
-    const response = await ai.generateContent({
+    const response = await ai.models.generateContent({
       model: process.env.AI_MODEL,
-      content: prompt,
+      contents: prompt,
     });
 
     const generatedText = response.text.trim();
@@ -104,18 +110,18 @@ export const generatePantrySuggestions = async (pantryItems, expiringItem) => {
   const ingredients = pantryItems.map((item) => item.name).join(", ");
   const expiringText =
     expiringItem.length > 0
-      ? `\Priority ingredients (expiring soon) : ${expiringItem.join(", ")}.`
+      ? `Priority ingredients (expiring soon): ${expiringItem.join(", ")}.`
       : "";
 
   const prompt = `Based on these available ingredients : ${ingredients}${expiringText} , suggest 5 creative recipe ideas that use these ingredients. Return only a JSON array of strings (no markdown) :
     ["Recipe idea 1",  "Recipe idea 2", "Recipe idea 3" ]
 
-    Each suggestion should be a brief , appetizing description (1-2 sentenes).`;
+    Each suggestion should be a brief, appetizing description (1-2 sentences).`;
 
   try {
-    const response = await ai.generateContent({
+    const response = await ai.models.generateContent({
       model: process.env.AI_MODEL,
-      content: prompt,
+      contents: prompt,
     });
 
     const generatedText = response.text.trim();
@@ -143,9 +149,9 @@ export const generateCookingTips = async (recipe) => {
     ["Tip 1", "Tip 2", "Tip 3"]`;
 
   try {
-    const response = await ai.generateContent({
+    const response = await ai.models.generateContent({
       model: process.env.AI_MODEL,
-      content: prompt,
+      contents: prompt,
     });
 
     const generatedText = response.text.trim();
