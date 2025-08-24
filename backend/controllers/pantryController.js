@@ -7,7 +7,7 @@ export const getPantryItems = async (req, res, next) => {
 
     const items = await PantryItem.findByUserId(req.user.id, {
       category,
-      is_running_low: is_running_low === "true",
+      is_running_low: is_running_low === "true" ? true : undefined,
       search,
     });
 

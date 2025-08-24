@@ -9,9 +9,9 @@ import {
 export const generateRecipe = async (req, res, next) => {
   try {
     const {
-      ingredients,
+      ingredients = [],
       usePantryIngredients = false,
-      dietryRestrictions = [],
+      dietaryRestrictions = [],
       cuisineType = "any",
       servings = 4,
       cookingTime,
@@ -38,7 +38,7 @@ export const generateRecipe = async (req, res, next) => {
     // Generate recipe using Gemini
     const recipe = await generateAI({
       ingredients: finalIngredients,
-      dietryRestrictions,
+      dietaryRestrictions,
       cuisineType,
       servings,
       cookingTime,
@@ -64,7 +64,10 @@ export const generatePantrySuggestions = async (req, res, next) => {
     const expiringItems = await PantryItem.getExpiringSoon(req.user.id, 7);
 
     const expiringNames = expiringItems.map((item) => item.name);
-    const suggestions = generatePantrySuggestionAI(pantryItems, expiringNames);
+    const suggestions = await generatePantrySuggestionAI(
+      pantryItems,
+      expiringNames
+    );
 
     res.status(200).json({
       success: true,
@@ -111,7 +114,7 @@ export const getRecipes = async (req, res, next) => {
       offset,
     } = req.query;
 
-    const recipe = await Recipe.findByUserId(req.user.id, {
+    const recipes = await Recipe.findByUserId(req.user.id, {
       search,
       cuisine_type,
       difficulty,
@@ -125,7 +128,7 @@ export const getRecipes = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: {
-        recipe,
+        recipes,
       },
     });
   } catch (err) {

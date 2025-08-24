@@ -1,4 +1,4 @@
-import MealPlan from "../models/mealPlan.js";
+import MealPlan from "../models/MealPlan.js";
 
 // ADD recipe to meal plan
 export const addToMealPlan = async (req, res, next) => {
@@ -21,8 +21,9 @@ export const addToMealPlan = async (req, res, next) => {
 // GET weekly meal plan
 export const getWeeklyMealPlan = async (req, res, next) => {
   try {
-    const { start_date, weekStartDate } = req.query;
+    const { start_date, end_date, weekStartDate, weekEndDate } = req.query;
     const startDate = start_date || weekStartDate;
+    const endDate = end_date || weekEndDate;
 
     if (!startDate) {
       return res.status(400).json({
@@ -31,7 +32,9 @@ export const getWeeklyMealPlan = async (req, res, next) => {
       });
     }
 
-    const mealPlans = await MealPlan.getWeeklyMealPlan(req.user.id, startDate);
+    const mealPlans = endDate
+      ? await MealPlan.findByDateRange(req.user.id, startDate, endDate)
+      : await MealPlan.getWeeklyPlan(req.user.id, startDate);
 
     res.json({
       success: true,

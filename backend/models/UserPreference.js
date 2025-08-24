@@ -7,9 +7,16 @@ class UserPreference {
       dietary_restrictions = [],
       allergies = [],
       preferred_cuisines = [],
+      default_servings,
       default_serving_size = 4,
+      measurement_unit,
       measurement_units = "metric",
     } = preferences;
+
+    const normalizedDefaultServings =
+      default_servings ?? default_serving_size ?? 4;
+    const normalizedMeasurementUnits =
+      measurement_units ?? measurement_unit ?? "metric";
 
     const result = await db.query(
       `INSERT INTO user_preferences (user_id, dietary_restrictions, allergies, preferred_cuisines, default_servings, measurement_units)
@@ -26,8 +33,8 @@ class UserPreference {
         dietary_restrictions,
         allergies,
         preferred_cuisines,
-        default_serving_size,
-        measurement_units,
+        normalizedDefaultServings,
+        normalizedMeasurementUnits,
       ]
     );
     return result.rows[0];

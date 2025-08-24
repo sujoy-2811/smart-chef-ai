@@ -15,6 +15,7 @@ router.put("/:id/toggle", shoppingListController.toggleChecked);
 router.delete("/:id", shoppingListController.deleteItem);
 router.delete("/clear/checked", shoppingListController.clearChecked);
 router.post("/clear/all", shoppingListController.clearAll);
+router.post("/add-to-pantry", shoppingListController.addCheckedToPantry);
 router.get("/add-to-pantry", shoppingListController.addCheckedToPantry);
 
 export default router;

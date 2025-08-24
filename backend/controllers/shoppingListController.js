@@ -3,19 +3,20 @@ import ShoppingList from "../models/ShoppingList.js";
 // Genrate shopping list from meal plan
 export const generateFromMealPlan = async (req, res, next) => {
   try {
-    const { start_date, endDate } = req.query;
+    const { start_date, end_date, endDate } = req.query;
+    const endDateParam = end_date || endDate;
 
-    if (!start_date || !endDate) {
+    if (!start_date || !endDateParam) {
       return res.status(400).json({
         success: false,
-        message: "Please provide start_date and endDate",
+        message: "Please provide start_date and end_date",
       });
     }
 
     const items = await ShoppingList.generateFromMealPlan(
       req.user.id,
       start_date,
-      endDate
+      endDateParam
     );
 
     res.status(200).json({

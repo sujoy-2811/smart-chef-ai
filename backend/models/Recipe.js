@@ -23,7 +23,22 @@ class Recipe {
         nutrition,
       } = recipeData;
 
+      
+
       // Insert recipe
+      // For JSONB field, convert to JSON string; for TEXT[] field, ensure it's an array
+      const instructionsJson = Array.isArray(instructions)
+        ? JSON.stringify(instructions)
+        : typeof instructions === "string"
+        ? instructions
+        : "[]";
+
+      const dietaryTagsArray = Array.isArray(dietary_tags)
+        ? dietary_tags
+        : dietary_tags
+        ? [dietary_tags]
+        : [];
+
       const recipeResult = await client.query(
         `INSERT INTO recipes (user_id, name, description, cuisine_type, difficulty, prep_time, cook_time, servings, instructions, dietary_tags, user_notes, image_url)
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
@@ -36,8 +51,8 @@ class Recipe {
           prep_time,
           cook_time,
           servings,
-          instructions,
-          dietary_tags || [],
+          instructionsJson,
+          dietaryTagsArray,
           user_notes || "",
           image_url || "",
         ]
