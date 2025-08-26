@@ -8,16 +8,36 @@ import {
   ShoppingCart,
   Settings,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
+
+import { useState, useEffect, useRef } from "react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
+    setIsDropdownOpen(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-white/85 backdrop-blur-md border-b border-sky-100 sticky top-0 z-50">
@@ -74,13 +94,62 @@ const Navbar = () => {
             >
               <Settings className="w-5 h-5" />
             </Link>
-            <button
+            {/* <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-sky-50 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
-            </button>
+            </button> */}
+
+            {/*  User Profile Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-sky-50 rounded-lg transition-colors"
+              >
+                <div className="w-8 h-8 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center text-white font-semibold text-xs uppercase transition-colors">
+                  {user?.name?.charAt(0) || "U"}
+                </div>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  {/* User Info */}
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user?.name || "User"}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {user?.email || "user@example.com"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Logout Button */}
+                  <div className="px-4 py-3 border-t border-gray-200">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-sky-50 rounded-lg transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">Logout</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
