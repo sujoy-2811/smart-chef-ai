@@ -7,6 +7,8 @@ import {
   ArrowLeft,
   Trash2,
   Calendar,
+  ShoppingCart as ShoppingListIcon,
+  BookOpen,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
@@ -62,10 +64,10 @@ const RecipeDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-stone-50">
         <Navbar />
         <div className="flex items-center justify-center h-96">
-          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin " />
+          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin " />
         </div>
       </div>
     );
@@ -79,129 +81,119 @@ const RecipeDetail = () => {
   const originalServings = recipe.servings || 4;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <Link
-          to="/recipes"
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Recipes
-        </Link>
-
-        {/* Recipe Header */}
-        <div className="bg-white rounded-xl border border-gray-200 p-8 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Compact Header with Breadcrumb */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <Link
+              to="/recipes"
+              className="w-10 h-10 flex items-center justify-center bg-white border border-stone-200 rounded-lg hover:bg-stone-50 text-stone-500 hover:text-stone-900 transition-colors shadow-sm"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-stone-900 leading-none mb-1">
                 {recipe.name}
               </h1>
-              {recipe.description && (
-                <p className="text-gray-600 text-lg">{recipe.description}</p>
-              )}
+              <div className="flex items-center gap-3 text-xs text-stone-500">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{totalTime}m total</span>
+                </div>
+                {recipe.calories && (
+                  <>
+                    <span className="w-1 h-1 bg-stone-300 rounded-full"></span>
+                    <span>~{recipe.calories} kcal</span>
+                  </>
+                )}
+                {recipe.cuisine_type && (
+                  <>
+                    <span className="w-1 h-1 bg-stone-300 rounded-full"></span>
+                    <span className="text-stone-600 font-medium">
+                      {recipe.cuisine_type}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-600 hover:text-orange-600 hover:border-orange-200 transition-colors shadow-sm"
+              onClick={() => window.print()}
+            >
+              <ChefHat className="w-4 h-4" />
+              <span>Cook Mode</span>
+            </button>
             <button
               onClick={handleDelete}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors shadow-sm"
             >
-              <Trash2 className="w-5 h-5" />
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
             </button>
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {recipe.cuisine_type && (
-              <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
-                {recipe.cuisine_type}
-              </span>
-            )}
-            {recipe.difficulty && (
-              <span
-                className={`px-3 py-1.5 rounded-full text-sm font-medium capitalize ${
-                  recipe.difficulty === "easy"
-                    ? "bg-green-100 text-green-700"
-                    : recipe.difficulty === "medium"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {recipe.difficulty}
-              </span>
-            )}
-            {recipe.dietary_tags &&
-              recipe.dietary_tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-          </div>
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap gap-6 text-gray-600">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span className="font-medium">{totalTime} minutes</span>
-            </div>
-            {recipe.prep_time && (
-              <div className="text-sm">Prep: {recipe.prep_time} min</div>
-            )}
-            {recipe.cook_time && (
-              <div className="text-sm">Cook: {recipe.cook_time} min</div>
-            )}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Ingredients Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">
+          {/* Left Column: Ingredients & Info */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Quick Actions / Tags - Mobile Friendly */}
+            <div className="bg-white rounded-xl border border-stone-200 p-4 shadow-sm">
+              <div className="flex flex-wrap gap-2">
+                {/* Difficulty Tag */}
+                <span
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider border ${
+                    recipe.difficulty === "easy"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                      : recipe.difficulty === "medium"
+                      ? "bg-amber-50 text-amber-700 border-amber-100"
+                      : "bg-red-50 text-red-700 border-red-100"
+                  }`}
+                >
+                  {recipe.difficulty || "Medium"}
+                </span>
+
+                {/* Description if short */}
+                <p className="w-full text-sm text-stone-600 mt-2 italic leading-relaxed">
+                  {recipe.description || "A delicious recipe to try."}
+                </p>
+              </div>
+            </div>
+
+            {/* Ingredients Card */}
+            <div className="bg-white rounded-xl border border-stone-200 p-5 shadow-sm sticky top-24">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-stone-100">
+                <h2 className="font-bold text-stone-900 flex items-center gap-2">
+                  <ShoppingListIcon className="w-4 h-4 text-orange-500" />
                   Ingredients
                 </h2>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">Servings:</span>
-                </div>
-              </div>
 
-              {/* Servings Adjuster */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3">
+                {/* Compact Servings Control */}
+                <div className="flex items-center bg-stone-50 rounded-lg p-1 border border-stone-200">
                   <button
                     onClick={() => setServings(Math.max(1, servings - 1))}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                    className="w-6 h-6 flex items-center justify-center hover:bg-white rounded text-stone-500 hover:text-stone-900 hover:shadow-sm transition-all text-xs"
                   >
-                    −
+                    -
                   </button>
-                  <span className="text-lg font-semibold text-gray-900 w-12 text-center">
+                  <span className="w-8 text-center text-xs font-bold text-stone-900">
                     {servings}
                   </span>
                   <button
                     onClick={() => setServings(servings + 1)}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                    className="w-6 h-6 flex items-center justify-center hover:bg-white rounded text-stone-500 hover:text-stone-900 hover:shadow-sm transition-all text-xs"
                   >
                     +
                   </button>
-                  {servings !== originalServings && (
-                    <button
-                      onClick={() => setServings(originalServings)}
-                      className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                    >
-                      Reset
-                    </button>
-                  )}
                 </div>
               </div>
 
-              {/* Ingredients List */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {recipe.ingredients &&
                   recipe.ingredients.map((ingredient, index) => {
                     const adjustedQty = adjustQuantity(
@@ -213,24 +205,28 @@ const RecipeDetail = () => {
                     return (
                       <label
                         key={index}
-                        className="flex items-start gap-3 cursor-pointer group"
+                        className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                          isChecked ? "bg-stone-50" : "hover:bg-stone-50"
+                        }`}
                       >
                         <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleIngredient(index)}
-                          className="mt-1 w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                          className="mt-1 w-4 h-4 text-orange-600 border-stone-300 rounded focus:ring-orange-500 accent-orange-600"
                         />
-                        <span
-                          className={`flex-1 ${
+                        <div
+                          className={`flex-1 text-sm ${
                             isChecked
-                              ? "line-through text-gray-400"
-                              : "text-gray-700"
+                              ? "line-through text-stone-400"
+                              : "text-stone-700"
                           }`}
                         >
-                          <span className="font-medium">{adjustedQty}</span>{" "}
-                          {ingredient.unit} {ingredient.name}
-                        </span>
+                          <span className="font-bold text-stone-900">
+                            {adjustedQty} {ingredient.unit}
+                          </span>
+                          <span className="ml-1">{ingredient.name}</span>
+                        </div>
                       </label>
                     );
                   })}
@@ -238,56 +234,78 @@ const RecipeDetail = () => {
             </div>
           </div>
 
-          {/* Instructions Section */}
+          {/* Right Column: Instructions */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Instructions
-              </h2>
-              <ol className="space-y-4">
-                {recipe.instructions &&
-                  recipe.instructions.map((step, index) => (
-                    <li key={index} className="flex gap-4">
-                      <span className="shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                        {index + 1}
-                      </span>
-                      <p className="text-gray-700 pt-1 flex-1">{step}</p>
-                    </li>
-                  ))}
-              </ol>
+            {/* Instructions Card */}
+            <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
+                <h2 className="font-bold text-stone-900 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-orange-500" />
+                  Instructions
+                </h2>
+                <span className="text-xs font-medium text-stone-500 bg-white px-2 py-1 rounded border border-stone-200">
+                  {recipe.instructions?.length || 0} Steps
+                </span>
+              </div>
+
+              <div className="p-6">
+                <div className="space-y-6">
+                  {recipe.instructions &&
+                    recipe.instructions.map((step, index) => (
+                      <div key={index} className="flex gap-4 group">
+                        <div className="shrink-0">
+                          <span className="w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-bold border border-orange-200 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                            {index + 1}
+                          </span>
+                        </div>
+                        <p className="text-stone-700 text-sm leading-relaxed pt-0.5 group-hover:text-stone-900 transition-colors">
+                          {step}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
 
-            {/* Nutrition Info */}
+            {/* Nutrition Grid - Ultra Compact */}
             {recipe.nutrition && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Nutrition (per serving)
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              <div className="bg-white rounded-xl border border-stone-200 p-5 shadow-sm">
+                <h3 className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-4">
+                  Nutrition Facts{" "}
+                  <span className="font-normal normal-case text-stone-400">
+                    (per serving)
+                  </span>
+                </h3>
+                <div className="grid grid-cols-5 gap-2 text-center">
                   <NutritionCard
                     label="Calories"
                     value={recipe.nutrition.calories}
                     unit="kcal"
+                    color="orange"
                   />
                   <NutritionCard
                     label="Protein"
                     value={recipe.nutrition.protein}
                     unit="g"
+                    color="stone"
                   />
                   <NutritionCard
                     label="Carbs"
                     value={recipe.nutrition.carbs}
                     unit="g"
+                    color="stone"
                   />
                   <NutritionCard
                     label="Fats"
                     value={recipe.nutrition.fats}
                     unit="g"
+                    color="stone"
                   />
                   <NutritionCard
                     label="Fiber"
                     value={recipe.nutrition.fiber}
                     unit="g"
+                    color="stone"
                   />
                 </div>
               </div>
@@ -295,11 +313,13 @@ const RecipeDetail = () => {
 
             {/* User Notes */}
             {recipe.user_notes && (
-              <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-6">
-                <h3 className="font-semibold text-emerald-900 mb-2">
-                  📝 Notes
+              <div className="bg-stone-50 rounded-xl border border-stone-200 p-5 mt-6">
+                <h3 className="font-bold text-stone-900 mb-2 text-sm flex items-center gap-2">
+                  <span className="text-lg">📝</span> Notes
                 </h3>
-                <p className="text-emerald-800">{recipe.user_notes}</p>
+                <p className="text-stone-700 text-sm leading-relaxed">
+                  {recipe.user_notes}
+                </p>
               </div>
             )}
           </div>
@@ -309,13 +329,25 @@ const RecipeDetail = () => {
   );
 };
 
-const NutritionCard = ({ label, value, unit }) => (
-  <div className="text-center p-4 bg-gray-50 rounded-lg">
-    <div className="text-2xl font-bold text-gray-900">
-      {value}
-      {unit}
+const NutritionCard = ({ label, value, unit, color = "stone" }) => (
+  <div
+    className={`p-2 rounded-lg border ${
+      color === "orange"
+        ? "bg-orange-50 border-orange-100"
+        : "bg-stone-50 border-stone-100"
+    }`}
+  >
+    <div
+      className={`text-sm font-bold ${
+        color === "orange" ? "text-orange-700" : "text-stone-700"
+      }`}
+    >
+      {value || 0}
+      <span className="text-[10px] font-normal ml-0.5">{unit}</span>
     </div>
-    <div className="text-sm text-gray-600 mt-1">{label}</div>
+    <div className="text-[10px] uppercase font-bold text-stone-400 mt-0.5 tracking-wide">
+      {label}
+    </div>
   </div>
 );
 
