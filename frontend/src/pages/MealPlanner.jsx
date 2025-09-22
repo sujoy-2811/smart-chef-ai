@@ -1,20 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, X, ChefHat } from "lucide-react";
+import {
+  Plus,
+  X,
+  ChefHat,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
-import { format, startOfWeek, addDays } from "date-fns";
+import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import api from "../services/api";
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner"];
-const DAYS_OF_WEEK = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
 const MealPlanner = () => {
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
@@ -87,14 +86,14 @@ const MealPlanner = () => {
     }
   };
 
-  const getDayMeals = (dayIndex) => {
-    const date = format(addDays(weekStart, dayIndex), "yyyy-MM-dd");
-    return mealPlan[date] || {};
+  const getDayMeals = (date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    return mealPlan[dateStr] || {};
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-stone-50">
         <Navbar />
         <div className="flex items-center justify-center h-96">
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -104,154 +103,195 @@ const MealPlanner = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Meal Planner</h1>
-            <p className="text-gray-600 mt-1">Plan your weekly meals</p>
-          </div>
-
-          {/* Week Navigation */}
+        {/* Header - Ultra Compact */}
+        <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setWeekStart(addDays(weekStart, -7))}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-            >
-              Previous Week
-            </button>
-            <button
-              onClick={() => setWeekStart(startOfWeek(new Date()))}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors"
-            >
-              This Week
-            </button>
-            <button
-              onClick={() => setWeekStart(addDays(weekStart, 7))}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-            >
-              Next Week
-            </button>
-          </div>
-        </div>
+            <h1 className="text-xl font-bold text-stone-900 tracking-tight leading-none">
+              Meal Planner
+            </h1>
 
-        {/* Week Display */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-          <div className="text-center">
-            <p className="text-sm text-gray-600">Week of</p>
-            <p className="text-lg font-semibold text-gray-900">
-              {format(weekStart, "MMMM d")} -{" "}
-              {format(addDays(weekStart, 6), "MMMM d, yyyy")}
-            </p>
-          </div>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          {/* Header Row */}
-          <div className="grid grid-cols-8 border-b border-gray-200 bg-gray-50">
-            <div className="p-4 font-semibold text-gray-700 border-r border-gray-200">
-              Meal
-            </div>
-            {DAYS_OF_WEEK.map((day, index) => (
-              <div
-                key={day}
-                className="p-4 text-center border-r border-gray-200 last:border-r-0"
-              >
-                <div className="font-semibold text-gray-900">{day}</div>
-                <div className="text-sm text-gray-500">
-                  {format(addDays(weekStart, index), "MMM d")}
+            <div className="hidden lg:flex items-center gap-3 ml-4">
+              <div className="h-5 w-px bg-stone-300"></div>
+              {/* Stats - Compact Row */}
+              <div className="flex items-center bg-white border border-stone-200 rounded-lg shadow-sm h-[32px] overflow-hidden">
+                <div className="px-3 py-1 border-r border-stone-100 flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold text-stone-400">
+                    Planned Meals
+                  </span>
+                  <span className="text-sm font-bold text-emerald-600">
+                    {Object.values(mealPlan).reduce(
+                      (acc, day) => acc + Object.keys(day).length,
+                      0
+                    )}
+                  </span>
+                </div>
+                <div className="px-3 py-1 flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold text-stone-400">
+                    Recipes
+                  </span>
+                  <span className="text-sm font-bold text-stone-700">
+                    {recipes.length}
+                  </span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          {/* Meal Rows */}
-          {MEAL_TYPES.map((mealType) => (
-            <div
-              key={mealType}
-              className="grid grid-cols-8 border-b border-gray-200 last:border-b-0"
-            >
-              <div className="p-4 font-medium text-gray-700 capitalize border-r border-gray-200 bg-gray-50">
-                {mealType}
-              </div>
-              {DAYS_OF_WEEK.map((_, dayIndex) => {
-                const date = format(addDays(weekStart, dayIndex), "yyyy-MM-dd");
-                const dayMeals = getDayMeals(dayIndex);
-                const meal = dayMeals[mealType];
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-stone-600 bg-white px-3 py-1.5 rounded-lg border border-stone-200 shadow-sm hidden sm:flex h-[36px]">
+              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs font-semibold">
+                {format(weekStart, "MMM d")} -{" "}
+                {format(addDays(weekStart, 6), "MMM d")}
+              </span>
+            </div>
 
+            {/* Nav - Ultra Compact */}
+            <div className="flex items-center bg-white rounded-lg border border-stone-200 shadow-sm h-[36px] p-0.5">
+              <button
+                onClick={() => setWeekStart(addDays(weekStart, -7))}
+                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-all"
+                title="Previous Week"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setWeekStart(startOfWeek(new Date()))}
+                className="px-3 text-[11px] font-bold uppercase text-stone-600 hover:text-emerald-600 hover:bg-emerald-50 border-x border-stone-100 h-full transition-all"
+              >
+                This Week
+              </button>
+
+              <button
+                onClick={() => setWeekStart(addDays(weekStart, 7))}
+                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-all"
+                title="Next Week"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Weekly Grid - Ultra Compact View */}
+        <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden h-[600px]">
+          <div className="h-full overflow-auto custom-scrollbar">
+            <div className="grid grid-cols-[40px_repeat(7,minmax(100px,1fr))] grid-rows-[32px_repeat(3,1fr)] min-w-[900px] h-full divide-x divide-stone-200">
+              {/* Header Corner */}
+              <div className="bg-stone-50 border-b border-stone-200 sticky top-0 z-20"></div>
+
+              {/* Day Headers */}
+              {[...Array(7)].map((_, index) => {
+                const date = addDays(weekStart, index);
+                const isToday = isSameDay(date, new Date());
                 return (
                   <div
-                    key={dayIndex}
-                    className="p-3 border-r border-gray-200 last:border-r-0 min-h-25 hover:bg-gray-50 transition-colors"
+                    key={index}
+                    className={`text-center border-b border-stone-200 sticky top-0 z-10 flex items-center justify-center gap-2 ${
+                      isToday
+                        ? "bg-emerald-50/95 backdrop-blur-sm"
+                        : "bg-stone-50/95 backdrop-blur-sm"
+                    }`}
                   >
-                    {meal ? (
-                      <div className="relative group">
-                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                          <p className="text-sm font-medium text-emerald-900 line-clamp-2">
-                            {meal.recipe_name}
-                          </p>
-                          <button
-                            onClick={() => handleRemoveMeal(meal.id)}
-                            className="absolute top-1 right-1 p-1 bg-white rounded hover:bg-red-50 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleAddMeal(date, mealType)}
-                        className="w-full h-full flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors group"
-                      >
-                        <Plus className="w-6 h-6" />
-                      </button>
-                    )}
+                    <span
+                      className={`font-bold text-xs uppercase tracking-wider ${
+                        isToday ? "text-emerald-700" : "text-stone-700"
+                      }`}
+                    >
+                      {format(date, "EEE")}
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${
+                        isToday ? "text-emerald-600" : "text-stone-400"
+                      }`}
+                    >
+                      {format(date, "d")}
+                    </span>
                   </div>
                 );
               })}
-            </div>
-          ))}
-        </div>
 
-        {/* Stats */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <p className="text-sm text-gray-600">Meals Planned</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {Object.values(mealPlan).reduce(
-                (acc, day) => acc + Object.keys(day).length,
-                0
-              )}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <p className="text-sm text-gray-600">Total Recipes</p>
-            <p className="text-2xl font-bold text-gray-900">{recipes.length}</p>
-          </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <p className="text-sm text-gray-600">This Week</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {format(weekStart, "MMM d")} -{" "}
-              {format(addDays(weekStart, 6), "MMM d")}
-            </p>
+              {/* Meal Rows */}
+              {MEAL_TYPES.map((mealType) => (
+                <>
+                  {/* Meal Type Label - Vertical */}
+                  <div
+                    key={`${mealType}-label`}
+                    className="flex items-center justify-center font-bold text-stone-400 bg-stone-50/50 uppercase text-[10px] tracking-widest border-b border-stone-200 last:border-b-0"
+                  >
+                    <span className="-rotate-90 whitespace-nowrap">
+                      {mealType}
+                    </span>
+                  </div>
+
+                  {/* Days for this meal type */}
+                  {[...Array(7)].map((_, index) => {
+                    const date = addDays(weekStart, index);
+                    const meal = getDayMeals(date)[mealType];
+                    const isToday = isSameDay(date, new Date());
+
+                    return (
+                      <div
+                        key={`${mealType}-${index}`}
+                        className={`p-1 border-b border-stone-200 last:border-b-0 transition-colors relative group/cell ${
+                          isToday ? "bg-emerald-50/20" : "hover:bg-stone-50"
+                        }`}
+                      >
+                        {meal ? (
+                          <div className="h-full w-full bg-white border border-stone-100 hover:border-emerald-300 rounded-lg p-2 shadow-sm group relative flex flex-col gap-1 transition-all">
+                            <div className="flex items-start gap-1.5">
+                              <div className="bg-emerald-100 p-0.5 rounded text-emerald-600 shrink-0 mt-[1px]">
+                                <ChefHat className="w-3 h-3" />
+                              </div>
+                              <span className="text-xs font-medium text-stone-700 line-clamp-3 leading-tight break-words">
+                                {meal.recipe_name}
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => handleRemoveMeal(meal.id)}
+                              className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-0.5 hover:bg-red-50 text-stone-300 hover:text-red-500 rounded transition-all"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              handleAddMeal(
+                                format(date, "yyyy-MM-dd"),
+                                mealType
+                              )
+                            }
+                            className="w-full h-full border border-dashed border-stone-100 rounded-lg flex items-center justify-center text-stone-200 hover:text-emerald-500 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all opacity-0 group-hover/cell:opacity-100"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Add Meal Modal */}
       {showAddModal && selectedSlot && (
         <AddMealModal
-          date={selectedSlot.date}
-          mealType={selectedSlot.mealType}
-          recipes={recipes}
+          isOpen={showAddModal}
           onClose={() => {
             setShowAddModal(false);
             setSelectedSlot(null);
           }}
+          selectedSlot={selectedSlot}
+          recipes={recipes}
           onSuccess={async () => {
             await fetchMealPlan();
             setShowAddModal(false);
@@ -263,7 +303,13 @@ const MealPlanner = () => {
   );
 };
 
-const AddMealModal = ({ date, mealType, recipes, onClose, onSuccess }) => {
+const AddMealModal = ({
+  isOpen,
+  onClose,
+  selectedSlot,
+  recipes,
+  onSuccess,
+}) => {
   const [selectedRecipe, setSelectedRecipe] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -271,6 +317,8 @@ const AddMealModal = ({ date, mealType, recipes, onClose, onSuccess }) => {
   const filteredRecipes = recipes.filter((recipe) =>
     recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -280,105 +328,130 @@ const AddMealModal = ({ date, mealType, recipes, onClose, onSuccess }) => {
     }
 
     setLoading(true);
-
     try {
       await api.post("/meal-plans", {
         recipe_id: selectedRecipe,
-        meal_date: date,
-        meal_type: mealType,
+        meal_date: selectedSlot.date,
+        meal_type: selectedSlot.mealType,
       });
-      toast.success("Meal added to plan");
+      toast.success("Meal added successfully");
       onSuccess();
     } catch (error) {
-      console.error("Error adding meal to plan:", error);
-      toast.error("Failed to add meal. Please try again.");
+      console.error("Error adding meal:", error);
+      toast.error("Failed to add meal");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full p-6">
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center justify-between p-6 border-b border-stone-100">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Add Meal</h2>
-            <p className="text-sm text-gray-600 capitalize">
-              {format(new Date(date), "EEEE, MMM d")} - {mealType}
+            <h2 className="text-xl font-bold text-stone-900">Add Meal</h2>
+            <p className="text-stone-500 text-sm mt-1 capitalize">
+              {format(new Date(selectedSlot.date), "EEEE, MMM d")} •{" "}
+              {selectedSlot.mealType}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="p-2 hover:bg-stone-50 rounded-full text-stone-400 hover:text-stone-600 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Search */}
-          <div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search recipes..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-stone-700">
+              Select Recipe
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search recipes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-stone-400 transition-all shadow-sm"
+              />
+              <Search className="absolute left-3 top-3.5 w-4 h-4 text-stone-400" />
+            </div>
 
-          {/* Recipe List */}
-          <div className="max-h-64 overflow-y-auto space-y-2 custom-scrollbar">
-            {filteredRecipes.length > 0 ? (
-              filteredRecipes.map((recipe) => (
-                <label
-                  key={recipe.id}
-                  className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedRecipe === recipe.id
-                      ? "border-emerald-500 bg-emerald-50"
-                      : "border-gray-200 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="recipe"
-                    value={recipe.id}
-                    checked={selectedRecipe === recipe.id}
-                    onChange={(e) => setSelectedRecipe(e.target.value)}
-                    className="w-4 h-4 text-emerald-500 border-gray-300 focus:ring-emerald-500"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{recipe.name}</p>
-                    {recipe.cuisine_type && (
-                      <p className="text-xs text-gray-500">
-                        {recipe.cuisine_type}
-                      </p>
-                    )}
-                  </div>
-                </label>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <ChefHat className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                <p className="text-gray-500">No recipes found</p>
-              </div>
-            )}
+            <div className="mt-2 h-60 overflow-y-auto border border-stone-200 rounded-xl custom-scrollbar bg-stone-50/50">
+              {filteredRecipes.length > 0 ? (
+                <div className="divide-y divide-stone-100">
+                  {filteredRecipes.map((recipe) => (
+                    <div
+                      key={recipe.id}
+                      onClick={() => setSelectedRecipe(recipe.id)}
+                      className={`p-3 cursor-pointer hover:bg-stone-50 transition-all duration-200 flex items-center gap-3 ${
+                        selectedRecipe === recipe.id
+                          ? "bg-emerald-50 hover:bg-emerald-50"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                          selectedRecipe === recipe.id
+                            ? "border-emerald-500 bg-emerald-500"
+                            : "border-stone-300"
+                        }`}
+                      >
+                        {selectedRecipe === recipe.id && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <div>
+                        <span
+                          className={`text-sm block ${
+                            selectedRecipe === recipe.id
+                              ? "text-emerald-900 font-semibold"
+                              : "text-stone-700 font-medium"
+                          }`}
+                        >
+                          {recipe.name}
+                        </span>
+                        {recipe.cuisine_type && (
+                          <span className="text-xs text-stone-500">
+                            {recipe.cuisine_type}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-stone-400 p-4">
+                  <ChefHat className="w-10 h-10 mb-2 opacity-20" />
+                  <p className="text-sm">No recipes found</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-4 py-2.5 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-50 font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !selectedRecipe}
-              className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
             >
-              {loading ? "Adding..." : "Add Meal"}
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  Add Meal
+                </>
+              )}
             </button>
           </div>
         </form>
