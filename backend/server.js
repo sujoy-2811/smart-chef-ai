@@ -12,7 +12,8 @@ const startServer = async () => {
     console.log("Database connected successfully");
 
     app.listen(PORT, () => {
-      console.log(`Server running on ${PORT}....`);
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Health check available at http://localhost:${PORT}/api/health`);
       console.log(`Environment: ${process.env.NODE_ENV}`);
     });
   } catch (error) {

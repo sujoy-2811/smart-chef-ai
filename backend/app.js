@@ -28,6 +28,11 @@ app.use("/api/recipes", recipeRoutes);
 app.use("/api/meal-plans", mealPlanRoutes);
 app.use("/api/shopping-list", shoppingListRoutes);
 
+// Container/platform health probe endpoint.
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
