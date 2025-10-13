@@ -125,8 +125,34 @@ const SignUp = () => {
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="flex items-center gap-3 mt-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium">OR</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          {/* Demo Account */}
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/login", {
+                state: {
+                  demoEmail: "demo@smartchef.test",
+                  demoPassword: "TX^xBrI#0!@kja*57^x",
+                },
+              })
+            }
+            className="mt-4 w-full flex items-center justify-center gap-2 border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium py-2.5 rounded-lg transition-colors text-sm"
+          >
+            <span>🧑‍🍳</span> Try Demo Account
+          </button>
+          <p className="text-center text-xs text-gray-400 mt-1">
+            No sign-up needed — explore with prefilled demo credentials
+          </p>
+
           {/* Login Link */}
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-gray-600 mt-4">
             Already have an account?{" "}
             <Link
               to="/login"

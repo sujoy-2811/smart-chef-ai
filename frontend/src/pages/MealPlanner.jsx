@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import {
   Plus,
   X,
@@ -218,7 +218,7 @@ const MealPlanner = () => {
 
               {/* Meal Rows */}
               {MEAL_TYPES.map((mealType) => (
-                <>
+                <Fragment key={mealType}>
                   {/* Meal Type Label - Vertical */}
                   <div
                     key={`${mealType}-label`}
@@ -276,7 +276,7 @@ const MealPlanner = () => {
                       </div>
                     );
                   })}
-                </>
+                </Fragment>
               ))}
             </div>
           </div>
