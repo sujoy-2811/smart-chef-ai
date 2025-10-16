@@ -96,7 +96,7 @@ const MealPlanner = () => {
       <div className="min-h-screen bg-stone-50">
         <Navbar />
         <div className="flex items-center justify-center h-96">
-          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -122,7 +122,7 @@ const MealPlanner = () => {
                   <span className="text-[10px] uppercase font-bold text-stone-400">
                     Planned Meals
                   </span>
-                  <span className="text-sm font-bold text-emerald-600">
+                  <span className="text-sm font-bold text-orange-600">
                     {Object.values(mealPlan).reduce(
                       (acc, day) => acc + Object.keys(day).length,
                       0
@@ -143,7 +143,7 @@ const MealPlanner = () => {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-stone-600 bg-white px-3 py-1.5 rounded-lg border border-stone-200 shadow-sm hidden sm:flex h-[36px]">
-              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              <Calendar className="w-3.5 h-3.5 text-orange-600" />
               <span className="text-xs font-semibold">
                 {format(weekStart, "MMM d")} -{" "}
                 {format(addDays(weekStart, 6), "MMM d")}
@@ -154,7 +154,7 @@ const MealPlanner = () => {
             <div className="flex items-center bg-white rounded-lg border border-stone-200 shadow-sm h-[36px] p-0.5">
               <button
                 onClick={() => setWeekStart(addDays(weekStart, -7))}
-                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-all"
+                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-orange-600 hover:bg-orange-50 rounded transition-all"
                 title="Previous Week"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -162,14 +162,14 @@ const MealPlanner = () => {
 
               <button
                 onClick={() => setWeekStart(startOfWeek(new Date()))}
-                className="px-3 text-[11px] font-bold uppercase text-stone-600 hover:text-emerald-600 hover:bg-emerald-50 border-x border-stone-100 h-full transition-all"
+                className="px-3 text-[11px] font-bold uppercase text-stone-600 hover:text-orange-600 hover:bg-orange-50 border-x border-stone-100 h-full transition-all"
               >
                 This Week
               </button>
 
               <button
                 onClick={() => setWeekStart(addDays(weekStart, 7))}
-                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-all"
+                className="w-8 h-full flex items-center justify-center text-stone-500 hover:text-orange-600 hover:bg-orange-50 rounded transition-all"
                 title="Next Week"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -194,20 +194,20 @@ const MealPlanner = () => {
                     key={index}
                     className={`text-center border-b border-stone-200 sticky top-0 z-10 flex items-center justify-center gap-2 ${
                       isToday
-                        ? "bg-emerald-50/95 backdrop-blur-sm"
+                        ? "bg-orange-50/95 backdrop-blur-sm"
                         : "bg-stone-50/95 backdrop-blur-sm"
                     }`}
                   >
                     <span
                       className={`font-bold text-xs uppercase tracking-wider ${
-                        isToday ? "text-emerald-700" : "text-stone-700"
+                        isToday ? "text-orange-700" : "text-stone-700"
                       }`}
                     >
                       {format(date, "EEE")}
                     </span>
                     <span
                       className={`text-xs font-medium ${
-                        isToday ? "text-emerald-600" : "text-stone-400"
+                        isToday ? "text-orange-600" : "text-stone-400"
                       }`}
                     >
                       {format(date, "d")}
@@ -239,13 +239,13 @@ const MealPlanner = () => {
                       <div
                         key={`${mealType}-${index}`}
                         className={`p-1 border-b border-stone-200 last:border-b-0 transition-colors relative group/cell ${
-                          isToday ? "bg-emerald-50/20" : "hover:bg-stone-50"
+                          isToday ? "bg-orange-50/20" : "hover:bg-stone-50"
                         }`}
                       >
                         {meal ? (
-                          <div className="h-full w-full bg-white border border-stone-100 hover:border-emerald-300 rounded-lg p-2 shadow-sm group relative flex flex-col gap-1 transition-all">
+                          <div className="h-full w-full bg-white border border-stone-100 hover:border-orange-200 rounded-lg p-2 shadow-sm group relative flex flex-col gap-1 transition-all">
                             <div className="flex items-start gap-1.5">
-                              <div className="bg-emerald-100 p-0.5 rounded text-emerald-600 shrink-0 mt-[1px]">
+                              <div className="bg-orange-100 p-0.5 rounded text-orange-600 shrink-0 mt-[1px]">
                                 <ChefHat className="w-3 h-3" />
                               </div>
                               <span className="text-xs font-medium text-stone-700 line-clamp-3 leading-tight break-words">
@@ -268,7 +268,7 @@ const MealPlanner = () => {
                                 mealType
                               )
                             }
-                            className="w-full h-full border border-dashed border-stone-100 rounded-lg flex items-center justify-center text-stone-200 hover:text-emerald-500 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all opacity-0 group-hover/cell:opacity-100"
+                            className="w-full h-full border border-dashed border-stone-100 rounded-lg flex items-center justify-center text-stone-200 hover:text-orange-600 hover:border-orange-200 hover:bg-orange-50/50 transition-all opacity-0 group-hover/cell:opacity-100"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -374,7 +374,7 @@ const AddMealModal = ({
                 placeholder="Search recipes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-stone-400 transition-all shadow-sm"
+                className="w-full pl-10 pr-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder-stone-400 transition-all shadow-sm"
               />
               <Search className="absolute left-3 top-3.5 w-4 h-4 text-stone-400" />
             </div>
@@ -388,14 +388,14 @@ const AddMealModal = ({
                       onClick={() => setSelectedRecipe(recipe.id)}
                       className={`p-3 cursor-pointer hover:bg-stone-50 transition-all duration-200 flex items-center gap-3 ${
                         selectedRecipe === recipe.id
-                          ? "bg-emerald-50 hover:bg-emerald-50"
+                          ? "bg-orange-50 hover:bg-orange-50"
                           : ""
                       }`}
                     >
                       <div
                         className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
                           selectedRecipe === recipe.id
-                            ? "border-emerald-500 bg-emerald-500"
+                            ? "border-orange-600 bg-orange-600"
                             : "border-stone-300"
                         }`}
                       >
@@ -407,7 +407,7 @@ const AddMealModal = ({
                         <span
                           className={`text-sm block ${
                             selectedRecipe === recipe.id
-                              ? "text-emerald-900 font-semibold"
+                              ? "text-orange-900 font-semibold"
                               : "text-stone-700 font-medium"
                           }`}
                         >
@@ -442,7 +442,7 @@ const AddMealModal = ({
             <button
               type="submit"
               disabled={loading || !selectedRecipe}
-              className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+              className="flex-1 px-4 py-2.5 bg-stone-900 hover:bg-stone-800 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
