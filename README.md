@@ -24,8 +24,8 @@ smartchef-ai/
 
 ## Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 24+
+- npm 11+
 
 ## Install
 
@@ -79,18 +79,75 @@ npm run dev
 ## Default URLs
 
 - Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5001`
+- Backend: `http://localhost:8000`
 
 Quick backend test:
 
 ```bash
-curl http://localhost:5001/
+curl http://localhost:8000/
 ```
 
 Expected response:
 
 ```txt
 API running
+```
+
+## Production Deployment (Docker)
+
+This repository includes a production-ready container setup:
+
+- Multi-stage Docker build (frontend build + backend runtime)
+- Single deployable image containing backend and built frontend assets
+- Compose health check endpoint at `/api/health`
+- Container hardening basics with `restart: unless-stopped` and `init: true`
+
+### Build Image
+
+From project root:
+
+```bash
+docker build -t smartchef-ai:latest .
+```
+
+### Run Image Directly
+
+```bash
+docker run --env-file backend/.env -p 8003:8003 smartchef-ai:latest
+```
+
+### Run With Docker Compose
+
+```bash
+docker compose --env-file backend/.env up -d
+```
+
+This starts service `smartchef-ai` with:
+
+- port mapping `${PORT:-8003}:${PORT:-8003}`
+- environment from `backend/.env`
+- health checks against `http://localhost:${PORT}/api/health`
+
+### Stop Compose Deployment
+
+```bash
+docker compose down
+```
+
+### Compose Notes
+
+- Current compose file uses an external Docker network named `npm-network`.
+- Create it once before first run if it does not already exist:
+
+```bash
+docker network create npm-network
+```
+
+- `PORT` is used in container runtime and port publishing. Pass it using `--env-file backend/.env`.
+- You can rebuild image on startup when needed:
+
+```bash
+docker compose --env-file backend/.env up --build -d
 ```
 
 ## Available Scripts

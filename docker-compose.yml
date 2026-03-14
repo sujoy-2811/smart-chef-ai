@@ -24,7 +24,6 @@ services:
       - "${PORT:-8003}:${PORT:-8003}"
     env_file:
       - backend/.env
-      - .env
 networks:
   default:
     external:

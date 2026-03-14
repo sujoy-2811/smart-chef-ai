@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
   const loading = false;
 
   const login = async (email, password) => {
-    console.log("login", email, password);
     try {
       const response = await api.post("/auth/login", { email, password });
       const { user, token } = response.data.data;
