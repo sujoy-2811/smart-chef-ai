@@ -113,6 +113,38 @@ export const login = async (req, res, next) => {
   }
 };
 
+// Demo login - no password required
+const DEMO_EMAIL = "demo@smartchef.test";
+
+export const demoLogin = async (req, res, next) => {
+  try {
+    const user = await User.findByEmail(DEMO_EMAIL);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Demo account not available" });
+    }
+
+    const token = generateToken(user);
+
+    res.status(200).json({
+      success: true,
+      message: "Demo login successful",
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        },
+        token,
+      },
+    });
+  } catch (err) {
+    console.error("Error in demoLogin:", err);
+    next(err);
+  }
+};
+
 export const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);

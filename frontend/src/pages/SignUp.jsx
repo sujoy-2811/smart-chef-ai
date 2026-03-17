@@ -9,7 +9,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, demoLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -139,20 +139,24 @@ const SignUp = () => {
           {/* Demo Account */}
           <button
             type="button"
-            onClick={() =>
-              navigate("/login", {
-                state: {
-                  demoEmail: "demo@smartchef.test",
-                  demoPassword: "TX^xBrI#0!@kja*57^x",
-                },
-              })
-            }
-            className="w-full flex items-center justify-center gap-2 border border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-800 font-medium py-2.5 rounded-xl transition-colors text-sm"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              const result = await demoLogin();
+              if (result.success) {
+                toast.success("Welcome to the demo!");
+                navigate("/dashboard");
+              } else {
+                toast.error(result.message);
+              }
+              setLoading(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 border border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-800 font-medium py-2.5 rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>🧑‍🍳</span> Try Demo Account
           </button>
           <p className="text-center text-xs text-stone-400 mt-2">
-            No sign-up needed — explore with prefilled demo credentials
+            No sign-up needed — one click to explore
           </p>
 
           {/* Login Link */}

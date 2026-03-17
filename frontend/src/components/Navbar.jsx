@@ -17,7 +17,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isDemoUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -169,6 +169,25 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+          </div>
+        </div>
+      )}
+      {/* Demo Banner */}
+      {isDemoUser && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center gap-2 text-sm text-amber-800">
+            <span>🔒</span>
+            <span>
+              <span className="font-semibold">Demo account</span> — explore
+              only.{" "}
+              <Link
+                to="/signup"
+                className="underline font-semibold text-orange-700 hover:text-orange-900"
+              >
+                Create an account
+              </Link>{" "}
+              for full access.
+            </span>
           </div>
         </div>
       )}
