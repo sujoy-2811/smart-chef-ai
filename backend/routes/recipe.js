@@ -2,10 +2,12 @@ import express from "express";
 
 import * as recipeController from "../controllers/recipeController.js";
 import authMiddleware from "../middleware/auth.js";
+import demoGuard from "../middleware/demoGuard.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
+router.use(demoGuard);
 
 // AI generation
 router.post("/generate", recipeController.generateRecipe);

@@ -2,10 +2,12 @@ import express from "express";
 
 import * as shoppingListController from "../controllers/shoppingListController.js";
 import authMiddleware from "../middleware/auth.js";
+import demoGuard from "../middleware/demoGuard.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
+router.use(demoGuard);
 
 router.get("/", shoppingListController.getShoppingList);
 router.post("/generate", shoppingListController.generateFromMealPlan);

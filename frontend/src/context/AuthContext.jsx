@@ -11,6 +11,8 @@ export const useAuth = () => {
   return context;
 };
 
+const DEMO_EMAIL = "demo@smartchef.test";
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem("token");
@@ -108,6 +110,7 @@ export const AuthProvider = ({ children }) => {
     demoLogin,
     logout,
     isAuthenticated: !!user,
+    isDemoUser: user?.email === DEMO_EMAIL,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

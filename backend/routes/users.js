@@ -1,11 +1,13 @@
 import express from "express";
 import * as userController from "../controllers/userController.js";
 import authMiddleware from "../middleware/auth.js";
+import demoGuard from "../middleware/demoGuard.js";
 
 const router = express.Router();
 
 // All routes in this file are protected
 router.use(authMiddleware);
+router.use(demoGuard);
 
 // Get user profile
 router.get("/profile", userController.getProfile);
