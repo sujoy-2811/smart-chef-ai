@@ -63,7 +63,7 @@ export const changePassword = async (req, res, next) => {
     }
 
     // Verify current password
-    const user = await User.findById(req.user.id);
+    const user = await User.findByEmail(req.user.email);
     const isCurrentPasswordValid = await User.verifyPassword(
       currentPassword,
       user.password
