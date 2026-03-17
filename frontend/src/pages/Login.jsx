@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import { ChefHat, Mail, Lock } from "lucide-react";
 
 const Login = () => {
-  const location = useLocation();
-  const demoState = location.state;
-  const [email, setEmail] = useState(demoState?.demoEmail ?? "");
-  const [password, setPassword] = useState(demoState?.demoPassword ?? "");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -47,20 +45,6 @@ const Login = () => {
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
-          {demoState?.demoEmail && (
-            <div className="mb-6 flex items-start gap-3 bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 text-sm text-stone-600">
-              <span className="text-lg">🧑‍🍳</span>
-              <div>
-                <p className="font-semibold text-orange-900">
-                  Demo credentials pre-filled!
-                </p>
-                <p className="text-orange-700 text-xs mt-0.5">
-                  Just hit <span className="font-bold">Sign In</span> to explore
-                  the app.
-                </p>
-              </div>
-            </div>
-          )}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>

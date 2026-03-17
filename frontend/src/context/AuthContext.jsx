@@ -74,6 +74,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const demoLogin = async () => {
+    try {
+      const response = await api.post("/auth/demo-login");
+      const { user, token } = response.data.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setUser(user);
+      return { success: true };
+    } catch (error) {
+      console.error("Demo login error:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Demo login failed",
+      };
+    }
+  };
+
   const logout = () => {
     // Just clear user (no API call)
     localStorage.removeItem("token");
@@ -86,6 +105,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    demoLogin,
     logout,
     isAuthenticated: !!user,
   };
